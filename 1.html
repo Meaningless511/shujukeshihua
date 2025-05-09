@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人口健康与医疗数据分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+
+        h1 {
+            text-align: center;
+        }
+
+
+       .back-arrow {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-8 relative">
+    <a href="http://127.0.0.1/shujukeshihua/shujukeshihua/index.html" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-blue-800">人口健康与医疗数据分析</h1>
+
+
+        <div id="loading" class="fixed top-0 left-0 w-full h-full bg-gray-200/50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-3">
+                <i class="fas fa-spinner fa-spin text-blue-500 text-xl"></i>
+                <span class="text-gray-700">数据加载中...</span>
+            </div>
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">预期寿命趋势分析</h2>
+                <canvas id="lifeExpectancyLineChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">预期寿命趋势图展示了Angola、Aruba和Benin在2000 - 2018年间居民预期寿命的变化，这与全球生命预期趋势可视化紧密相关。Aruba作为加勒比地区的富裕岛国，凭借完善的医疗体系和较高的社会经济水平，预期寿命从2000年的76岁稳步提升至2018年的78.6岁；而Benin尽管在医疗投入上有所努力，预期寿命从57岁增长到63岁，但受限于有限的医疗资源和公共卫生条件，其增长速度远低于全球平均水平。反观Angola，由于长期受内战、贫困和艾滋病等因素影响，预期寿命在2010年58岁，到2018年仅微增至64岁，在全球生命预期提升的大趋势下，形成鲜明的反面案例。这种对比凸显了经济发展水平、医疗资源分配以及公共卫生状况对人口预期寿命的重要影响。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">核心健康指标对比</h2>
+                <canvas id="healthIndicatorsBarChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">本图表对比了日本、南非和印度三个典型国家的核心健康指标(2019年数据)。日本作为全球预期寿命最长的国家(84.3岁)，其婴儿死亡率仅为2.1‰，肺结核发病率13/10万，非传染性疾病死亡率5.7/10万，体现了其完善的医疗体系和公共卫生管理能力。南非则呈现矛盾现象：虽然医疗基础设施相对完善，但因艾滋病高发(感染率18.9%)和社会不平等，其婴儿死亡率高达24.2‰，非传染性疾病死亡率达615/10万，预期寿命仅63.8岁，远低于其经济发展水平应有的表现。印度作为发展中大国，婴儿死亡率28.2‰，肺结核发病率193/10万，非传染性疾病死亡率19/10万，这些指标与其71.5岁的预期寿命相符，反映了医疗资源分配不均和基层卫生服务不足的问题。这三个案例清晰地展示了健康指标与全球生命预期趋势的关联性：即使经济水平相似的国家，因疾病负担和医疗体系效率不同，预期寿命可能出现显著差异。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">巴西疫苗接种与预期寿命</h2>
+                <canvas id="vaccinationRateLineChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">本图表展示了巴西2000-2010年间疫苗接种率与预期寿命的变化趋势。巴西的百白破疫苗接种率从2000年的98%提升至2010年的99%，乙肝疫苗从94%增至96%，麻疹疫苗在99%徘徊。同期，预期寿命从74岁增至77.3岁。疫苗接种率的提升有效降低了可预防疾病的发病率，为预期寿命增长做出了重要贡献。特别是在2006年引入轮状病毒疫苗后，儿童死亡率显著下降，推动了预期寿命的加速增长。这表明疫苗接种政策是提升国民健康水平的关键因素之一。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">医疗资源分布</h2>
+                <canvas id="hospitalBedsBarChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">医疗资源分布柱状图对比不同国家的医院病床数。医院病床数作为衡量医疗资源配备的重要指标，直接影响国家对患者的救治能力。一般而言，病床数越多，越能为患者提供及时的医疗救治，有利于提升居民健康水平和预期寿命，在预期寿命趋势图中多表现为稳定增长或较高水平。但如果某国虽病床数较多，却存在医疗服务质量不高或病床利用率低的问题，在面对公共卫生事件时，仍无法有效保障居民健康，预期寿命也难以得到显著提升，这体现出医疗资源数量与质量对全球生命预期趋势的综合影响。</p>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white p-4 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-3 text-gray-700">数据分析总结</h2>
+            <p class="text-gray-600 text-sm">
+                这四组数据从不同维度揭示了影响全球生命预期趋势的关键因素：经济发展水平和医疗资源投入构成基础支撑，高收入国家通常凭借完善的医疗体系实现更优的健康结果，而欠发达地区受限于资源短缺增长缓慢；核心健康指标直接反映公共卫生效能，高效的医疗管理能显著改善婴儿死亡率和疾病负担；疫苗接种进展体现疾病防控能力，免疫规划的完善与预期寿命提升呈现显著正相关；医疗资源配置则显示硬件投入需要配合服务质量，单纯增加资源数量若分配不均仍难以实现预期效果。这些趋势共同表明，全球生命预期的差异本质上是社会经济基础、医疗体系效率和公共卫生干预措施综合作用的结果，只有多维度协同发展才能实现健康水平的持续提升。
+            </p>
+        </div>
+    </div>
+
+    <script>
+ 
+        let charts = {
+            lifeExpectancy: null,
+            healthIndicators: null,
+            vaccination: null,
+            hospitalResources: null
+        };
+
+
+        const healthIndicatorColors = {
+            'Japan': '#3b82f6', 
+            'South Africa': '#ef4444',
+            'India': '#f59e0b', 
+            'Angola': '#10b981',
+            'Aruba': '#8b5cf6',
+            'Benin': '#ec4899'
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading();
+
+            fetch('final.csv')
+               .then(response => response.text())
+               .then(csvData => {
+                    Papa.parse(csvData, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: function (results) {
+                            processData(results.data);
+                            hideLoading();
+                        },
+                        error: function () {
+                            alert('文件解析失败，请检查文件格式');
+                            hideLoading();
+                        }
+                    });
+                })
+               .catch(error => {
+                    alert('文件读取失败，请确保final.csv文件存在');
+                    hideLoading();
+                });
+        });
+
+        function processData(rawData) {
+
+            const validData = rawData.filter(item =>
+                item.Country && item.Year &&!isNaN(item["Life expectancy"])
+            );
+
+
+            Object.values(charts).forEach(chart => chart && chart.destroy());
+
+
+            createLifeExpectancyChart(validData);
+            createHealthIndicatorsChart(validData);
+            createVaccinationChart(validData);
+            createHospitalResourcesChart(validData);
+        }
+
+
+        function createLifeExpectancyChart(data) {
+            const selectedCountries = ['Angola', 'Aruba', 'Benin'];
+            const years = [...new Set(data.map(d => d.Year))].sort((a, b) => a - b);
+
+            const ctx = document.getElementById('lifeExpectancyLineChart').getContext('2d');
+            charts.lifeExpectancy = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: selectedCountries.map(country => ({
+                        label: country,
+                        data: years.map(year => {
+                            const d = data.find(item =>
+                                item.Country === country && item.Year === year
+                            );
+                            return d? d["Life expectancy"] : null;
+                        }),
+                        borderColor: healthIndicatorColors[country],
+                        backgroundColor: healthIndicatorColors[country],
+                        tension: 0.3,
+                        fill: false
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: '年份' } },
+                        y: { title: { display: true, text: '预期寿命（年）' } }
+                    }
+                }
+            });
+        }
+
+
+        function createHealthIndicatorsChart(data) {
+            const selectedCountries = ['Japan', 'South Africa', 'India'];
+            const latestYear = Math.max(...data.map(d => d.Year));
+            const indicators = [
+                { key: 'Infant Mortality', label: '婴儿死亡率(‰)' },
+                { key: 'Tuberculosis Incidence', label: '肺结核发病率(/10万)' },
+                { key: 'Non-communicable Mortality', label: '非传染性疾病死亡率(/10万)' }
+            ];
+
+
+            const countryData = selectedCountries.map(country => {
+                const d = data.find(item => 
+                    item.Country === country && item.Year === latestYear
+                ) || {};
+                return {
+                    country,
+                    infantMortality: d['Infant Mortality'] || 0,
+                    tuberculosis: d['Tuberculosis Incidence'] || 0,
+                    nonCommunicable: d['Non-communicable Mortality'] || 0
+                };
+            });
+
+            const ctx = document.getElementById('healthIndicatorsBarChart').getContext('2d');
+            charts.healthIndicators = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: indicators.map(i => i.label),
+                    datasets: selectedCountries.map(country => {
+                        const d = countryData.find(c => c.country === country);
+                        return {
+                            label: country,
+                            data: [
+                                d.infantMortality,
+                                d.tuberculosis,
+                                d.nonCommunicable
+                            ],
+                            backgroundColor: healthIndicatorColors[country],
+                            borderColor: healthIndicatorColors[country],
+                            borderWidth: 1
+                        };
+                    })
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `核心健康指标对比 (${latestYear}年)`
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y;
+                                        if (context.dataIndex === 0) {
+                                            label += '‰';
+                                        } else {
+                                            label += '/10万';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '健康指标'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '比率'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function createVaccinationChart(data) {
+            const selectedCountry = 'Brazil';
+            const countryData = data.filter(d => d.Country === selectedCountry);
+
+            const years = [...new Set(countryData.map(d => d.Year))]
+                .sort((a, b) => a - b)
+                .filter(year => year <= 2010);
+            
+            const ctx = document.getElementById('vaccinationRateLineChart').getContext('2d');
+            charts.vaccination = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: '百白破疫苗接种率',
+                            data: years.map(year => {
+                                const d = countryData.find(item => item.Year === year);
+                                return d ? d['DPT Immunization'] : null;
+                            }),
+                            borderColor: '#3b82f6',
+                            backgroundColor: '#3b82f6',
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '乙肝疫苗接种率',
+                            data: years.map(year => {
+                                const d = countryData.find(item => item.Year === year);
+                                return d ? d['HepB3 Immunization'] : null;
+                            }),
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '麻疹疫苗接种率',
+                            data: years.map(year => {
+                                const d = countryData.find(item => item.Year === year);
+                                return d ? d['Measles Immunization'] : null;
+                            }),
+                            borderColor: '#ef4444',
+                            backgroundColor: '#ef4444',
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '预期寿命',
+                            data: years.map(year => {
+                                const d = countryData.find(item => item.Year === year);
+                                return d ? d['Life expectancy'] : null;
+                            }),
+                            borderColor: '#8b5cf6',
+                            backgroundColor: '#8b5cf6',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${selectedCountry}疫苗接种与预期寿命 (2000-2010)`
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '接种率 (%)'
+                            },
+                            min: 50,
+                            max: 100
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '预期寿命 (岁)'
+                            },
+                            min: 60,
+                            max: 80,
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function createHospitalResourcesChart(data) {
+            const countries = [...new Set(data.map(d => d.Country))];
+
+            const ctx = document.getElementById('hospitalBedsBarChart').getContext('2d');
+            charts.hospitalResources = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: countries,
+                    datasets: [{
+                        label: '医院床位数量',
+                        data: countries.map(country => {
+                            const d = data.filter(item => item.Country === country);
+                            return d.length? d.reduce((sum, item) => sum + (item["Hospital beds"] || 0), 0) / d.length : 0;
+                        }),
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { title: { display: true, text: '床位数量（每千人）' } }
+                    }
+                }
+            });
+        }
+
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

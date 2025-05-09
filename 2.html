@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社会经济与生活环境数据分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+
+        h1 {
+            text-align: center;
+        }
+
+       .back-arrow {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-8 relative">
+    <a href="http://127.0.0.1/shujukeshihua/shujukeshihua/index.html" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-blue-800">社会经济与生活环境数据分析</h1>
+
+        <div id="loading" class="fixed top-0 left-0 w-full h-full bg-gray-200/50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-3">
+                <i class="fas fa-spinner fa-spin text-blue-500 text-xl"></i>
+                <span class="text-gray-700">数据加载中...</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">经济发展与预期寿命关系</h2>
+                <canvas id="gdpGniLineChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">折线图展示了国内生产总值（GDP）、国民总收入（GNI）随年份的变化趋势及其与预期寿命的关联。以美国和埃塞俄比亚为例，2010 - 2018 年间，美国 GDP 从约 14.99 万亿美元增长至约 20.6 万亿美元，GNI 从约 15.1 万亿美元增长至约 20.9 万亿美元，同期预期寿命从 81 岁微增至 81.2 岁 。经济的持续增长为美国医疗体系升级提供了资金，大量投入用于新药研发、高端医疗设备购置以及医疗人才培养，例如美国在癌症靶向治疗药物研发领域全球领先，显著提高了癌症患者生存率，一定程度上支撑了预期寿命的稳定。
+反观埃塞俄比亚，2010 - 2018 年 GDP 从约 299 亿美元增长至约 842 亿美元，GNI 从约 298 亿美元增长至约 838 亿美元，虽有显著增长，但经济总量仍较低。同期预期寿命从 63.3 岁增长至 68.1 岁，增速缓慢且预期寿命绝对值较低。该国因经济基础薄弱，医疗资源极度匮乏，每千人医生数量不足 1 人，远低于世界平均水平，许多常见疾病无法得到及时有效治疗，严重制约了预期寿命的提升，凸显经济发展水平不足对生命预期的负面影响。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">失业率与预期寿命关系</h2>
+                <canvas id="unemploymentLifeExpectancyScatterChart"></canvas>
+                <p class="mt-3 text-gray-600 text-sm">散点图直观呈现了失业率与预期寿命的关联。以希腊和挪威为例，希腊在 2010 - 2015 年受欧债危机冲击，失业率从 16.36% 飙升至 28.89%，同期预期寿命从 83 岁短暂升至 83.7 岁 。高失业率致使大量民众失去收入来源，生活质量下降，心理健康问题凸显，如抑郁症、焦虑症等精神疾病发病率上升。同时，因失业导致的医保覆盖率下降，许多患者无法承担医疗费用，慢性病患者因缺乏持续治疗，病情恶化，进而影响整体预期寿命。
+而挪威失业率长期稳定在 2.94% - 4% 较低水平，2010 - 2015 年间预期寿命从 83.2 岁稳步增长至 84.2 岁。稳定的就业环境保障了居民收入，民众有能力进行健康投资，如参与健身活动、定期体检等。同时，政府依托稳定税收构建了完善的医疗保障体系，为居民提供免费且高质量的医疗服务，有效预防和治疗疾病，促进了预期寿命的提升。</p>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white p-4 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-3 text-gray-700">数据分析总结</h2>
+            <p class="text-gray-600 text-sm">
+                从上述数据与案例可见，社会经济因素对全球生命预期趋势起着关键作用。经济发展水平是提升预期寿命的核心驱动力，发达经济体凭借充足的资金投入，完善医疗体系、提升公共卫生服务，推动预期寿命增长；而经济落后国家因资源有限，难以满足居民基本医疗需求，预期寿命增长缓慢。
+                就业状况同样不容忽视，失业率上升会引发一系列健康风险，破坏居民正常生活节奏，增加心理和生理健康负担；稳定的就业则是维持居民健康生活的重要保障，通过稳定收入和完善的医疗保障间接提升预期寿命。这些因素相互交织，共同塑造了全球生命预期趋势的多样性与复杂性，也为各国制定针对性政策、改善居民健康水平提供了数据依据与方向指引。
+            </p>
+        </div>
+    </div>
+
+    <script>
+
+        let charts = {
+            gdpGni: null,
+            unemploymentLifeExpectancy: null
+        };
+
+        const generateColor = () => {
+            const hue = Math.floor(Math.random() * 360);
+            return `hsl(${hue}, 70%, 50%)`;
+        };
+
+        const predefinedColors = {
+            'USA_GDP': 'rgba(54, 162, 235, 1)',
+            'USA_GNI': 'rgba(54, 162, 235, 0.6)',
+            'USA_LIFE': 'rgba(54, 162, 235, 0.3)',
+            'ETH_GDP': 'rgba(255, 99, 132, 1)',
+            'ETH_GNI': 'rgba(255, 99, 132, 0.6)',
+            'ETH_LIFE': 'rgba(255, 99, 132, 0.3)',
+            'AVG_GDP': 'rgba(75, 192, 192, 1)',
+            'AVG_GNI': 'rgba(75, 192, 192, 0.6)',
+            'AVG_LIFE': 'rgba(75, 192, 192, 0.3)',
+            'GREECE': 'rgba(153, 102, 255, 1)',
+            'NORWAY': 'rgba(255, 159, 64, 1)'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading();
+
+            fetch('final.csv')
+               .then(response => response.text())
+               .then(csvData => {
+                    Papa.parse(csvData, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: function (results) {
+                            processData(results.data);
+                            hideLoading();
+                        },
+                        error: function () {
+                            alert('文件解析失败，请检查文件格式');
+                            hideLoading();
+                        }
+                    });
+                })
+               .catch(error => {
+                    alert('文件读取失败，请确保final.csv文件存在');
+                    hideLoading();
+                });
+        });
+
+        function processData(rawData) {
+
+            const validData = rawData.filter(item =>
+                item.Country && item.Year &&!isNaN(item["Life expectancy"])
+            );
+
+            Object.values(charts).forEach(chart => chart && chart.destroy());
+
+            createGdpGniChart(validData);
+            createUnemploymentLifeExpectancyChart(validData);
+        }
+
+        function createGdpGniChart(data) {
+            const years = [...new Set(data.map(d => d.Year))].sort((a, b) => a - b);
+
+            const usaData = data.filter(d => d.Country === 'United States');
+            const ethData = data.filter(d => d.Country === 'Ethiopia');
+
+            const gdpDataByYear = {};
+            const gniDataByYear = {};
+            const lifeExpectancyDataByYear = {};
+
+            years.forEach(year => {
+                gdpDataByYear[year] = [];
+                gniDataByYear[year] = [];
+                lifeExpectancyDataByYear[year] = [];
+
+                data.filter(item => item.Year === year).forEach(item => {
+                    if (item.GDP) gdpDataByYear[year].push(item.GDP);
+                    if (item.GNI) gniDataByYear[year].push(item.GNI);
+                    if (item["Life expectancy"]) lifeExpectancyDataByYear[year].push(item["Life expectancy"]);
+                });
+            });
+
+            const ctx = document.getElementById('gdpGniLineChart').getContext('2d');
+            charts.gdpGni = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+
+                        {
+                            label: '美国 GDP',
+                            data: years.map(year => {
+                                const record = usaData.find(d => d.Year === year);
+                                return record ? record.GDP : null;
+                            }),
+                            borderColor: predefinedColors.USA_GDP,
+                            backgroundColor: predefinedColors.USA_GDP,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '美国 GNI',
+                            data: years.map(year => {
+                                const record = usaData.find(d => d.Year === year);
+                                return record ? record.GNI : null;
+                            }),
+                            borderColor: predefinedColors.USA_GNI,
+                            backgroundColor: predefinedColors.USA_GNI,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '美国 预期寿命',
+                            data: years.map(year => {
+                                const record = usaData.find(d => d.Year === year);
+                                return record ? record["Life expectancy"] : null;
+                            }),
+                            borderColor: predefinedColors.USA_LIFE,
+                            backgroundColor: predefinedColors.USA_LIFE,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y1'
+                        },
+
+                        {
+                            label: '埃塞俄比亚 GDP',
+                            data: years.map(year => {
+                                const record = ethData.find(d => d.Year === year);
+                                return record ? record.GDP : null;
+                            }),
+                            borderColor: predefinedColors.ETH_GDP,
+                            backgroundColor: predefinedColors.ETH_GDP,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '埃塞俄比亚 GNI',
+                            data: years.map(year => {
+                                const record = ethData.find(d => d.Year === year);
+                                return record ? record.GNI : null;
+                            }),
+                            borderColor: predefinedColors.ETH_GNI,
+                            backgroundColor: predefinedColors.ETH_GNI,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '埃塞俄比亚 预期寿命',
+                            data: years.map(year => {
+                                const record = ethData.find(d => d.Year === year);
+                                return record ? record["Life expectancy"] : null;
+                            }),
+                            borderColor: predefinedColors.ETH_LIFE,
+                            backgroundColor: predefinedColors.ETH_LIFE,
+                            tension: 0.3,
+                            fill: false,
+                            yAxisID: 'y1'
+                        },
+
+                        {
+                            label: '全球平均 GDP',
+                            data: years.map(year => 
+                                gdpDataByYear[year].length > 0 ? 
+                                gdpDataByYear[year].reduce((sum, val) => sum + val, 0) / gdpDataByYear[year].length : 
+                                null
+                            ),
+                            borderColor: predefinedColors.AVG_GDP,
+                            backgroundColor: predefinedColors.AVG_GDP,
+                            tension: 0.3,
+                            fill: false,
+                            borderDash: [5, 5],
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '全球平均 GNI',
+                            data: years.map(year => 
+                                gniDataByYear[year].length > 0 ? 
+                                gniDataByYear[year].reduce((sum, val) => sum + val, 0) / gniDataByYear[year].length : 
+                                null
+                            ),
+                            borderColor: predefinedColors.AVG_GNI,
+                            backgroundColor: predefinedColors.AVG_GNI,
+                            tension: 0.3,
+                            fill: false,
+                            borderDash: [5, 5],
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '全球平均 预期寿命',
+                            data: years.map(year => 
+                                lifeExpectancyDataByYear[year].length > 0 ? 
+                                lifeExpectancyDataByYear[year].reduce((sum, val) => sum + val, 0) / lifeExpectancyDataByYear[year].length : 
+                                null
+                            ),
+                            borderColor: predefinedColors.AVG_LIFE,
+                            backgroundColor: predefinedColors.AVG_LIFE,
+                            tension: 0.3,
+                            fill: false,
+                            borderDash: [5, 5],
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: '年份' },
+                            grid: { display: false }
+                        },
+                        y: { 
+                            title: { display: true, text: 'GDP/GNI 数值' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            position: 'left'
+                        },
+                        y1: {
+                            title: { display: true, text: '预期寿命(岁)' },
+                            grid: { display: false },
+                            position: 'right',
+                            min: 0,
+
+                            afterFit: function(scale) {
+                                scale.paddingRight = 20;
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        function createUnemploymentLifeExpectancyChart(data) {
+            const countries = [...new Set(data.map(d => d.Country))];
+            const years = [...new Set(data.map(d => d.Year))].sort((a, b) => a - b);
+
+            const greeceData = data.filter(d => d.Country === 'Greece');
+            const norwayData = data.filter(d => d.Country === 'Norway');
+
+            const allCountriesData = countries.map(country => {
+                const filteredData = data.filter(item => item.Country === country);
+                const unemployment = filteredData.length > 0 ? filteredData[0]["Unemployment"] : 0;
+                const lifeExpectancy = filteredData.length > 0 ? filteredData[0]["Life expectancy"] : 0;
+                return {
+                    country,
+                    unemployment,
+                    lifeExpectancy
+                };
+            });
+
+            const greeceYearlyData = years.map(year => {
+                const record = greeceData.find(d => d.Year === year);
+                return {
+                    x: record ? record["Unemployment"] : null,
+                    y: record ? record["Life expectancy"] : null,
+                    year: year
+                };
+            });
+
+            const norwayYearlyData = years.map(year => {
+                const record = norwayData.find(d => d.Year === year);
+                return {
+                    x: record ? record["Unemployment"] : null,
+                    y: record ? record["Life expectancy"] : null,
+                    year: year
+                };
+            });
+
+            const ctx = document.getElementById('unemploymentLifeExpectancyScatterChart').getContext('2d');
+            charts.unemploymentLifeExpectancy = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '所有国家数据',
+                            data: allCountriesData.map(item => ({
+                                x: item.unemployment,
+                                y: item.lifeExpectancy
+                            })),
+                            backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                            borderColor: 'rgba(200, 200, 200, 0.8)',
+                            pointRadius: 5
+                        },
+                        {
+                            label: '希腊 (按年份)',
+                            data: greeceYearlyData,
+                            backgroundColor: predefinedColors.GREECE,
+                            borderColor: predefinedColors.GREECE,
+                            pointRadius: 7,
+                            pointStyle: 'rect'
+                        },
+                        {
+                            label: '挪威 (按年份)',
+                            data: norwayYearlyData,
+                            backgroundColor: predefinedColors.NORWAY,
+                            borderColor: predefinedColors.NORWAY,
+                            pointRadius: 7,
+                            pointStyle: 'triangle'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null && context.parsed.y !== null) {
+                                        label += `失业率: ${context.parsed.x}%, 预期寿命: ${context.parsed.y}岁`;
+                                        if (context.dataset.label.includes('希腊') || context.dataset.label.includes('挪威')) {
+                                            label += ` (${context.raw.year}年)`;
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: '失业率 (%)' },
+                            min: 0
+                        },
+                        y: { 
+                            title: { display: true, text: '预期寿命 (岁)' },
+                            min: 50
+                        }
+                    }
+                }
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>
